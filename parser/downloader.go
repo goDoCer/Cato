@@ -19,5 +19,5 @@ func Download() error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile("../cate.html", html, 0644)
+	return ioutil.WriteFile("cate.html", html, 0644)
 }
