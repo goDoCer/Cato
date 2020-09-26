@@ -1,4 +1,4 @@
-package main
+package parser
 
 import (
 	"encoding/json"
@@ -8,7 +8,7 @@ import (
 type secrets map[string]string
 
 func loadSecrets() (secrets, error) {
-	file, err := ioutil.ReadFile("secrets.json")
+	file, err := ioutil.ReadFile("../secrets.json")
 	if err != nil {
 		return nil, err
 	}

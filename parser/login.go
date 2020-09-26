@@ -1,15 +1,17 @@
-package main
+package parser
 
 import (
 	"net/http"
 )
+
+const cateURL = "https://cate.doc.ic.ac.uk"
 
 func getAuth(s secrets) string {
 	return "Basic " + s["Auth"]
 }
 
 func login(auth string) (*http.Response, error) {
-	req, err := http.NewRequest("GET", "https://cate.doc.ic.ac.uk", nil)
+	req, err := http.NewRequest("GET", cateURL, nil)
 	if err != nil {
 		return nil, err
 	}
