@@ -4,6 +4,8 @@ import (
 	"io/ioutil"
 )
 
+const pageLocation = "cate.html"
+
 func Download() error {
 	s, err := loadSecrets()
 	if err != nil {
@@ -19,5 +21,5 @@ func Download() error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile("cate.html", html, 0644)
+	return ioutil.WriteFile(pageLocation, html, 0644)
 }
