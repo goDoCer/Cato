@@ -30,14 +30,3 @@ func Init() {
 	info.getName(doc)
 	fmt.Println(*info)
 }
-
-func getTables() error {
-	doc, err := loadFile()
-	if err != nil {
-		return err
-	}
-	doc.Find("[src='icons/arrowredright.gif']").Each(func(i int, _ *goquery.Selection) {
-		fmt.Println(i)
-	})
-	return nil
-}
