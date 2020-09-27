@@ -5,6 +5,8 @@
 *.so
 *.dylib
 
+.vscode
+
 #secrets
 secrets.json
 

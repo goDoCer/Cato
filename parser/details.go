@@ -31,18 +31,27 @@ const (
 	bio
 )
 
+func (d *details) getName(doc *goquery.Document) {
+	d.name = doc.Find("[style='padding-left: 5px; text-align: left;'][colspan='3']").
+		First().
+		Children().
+		First().
+		Text()
+}
+
 func (d *details) getYearAndCourse(doc *goquery.Document) error {
-	err := errors.New("No class or course information found\nTry cate fetching")
-	doc.Find("[name='class']").EachWithBreak(func(_ int, sel *goquery.Selection) bool {
-		if _, ok := sel.Attr("checked"); ok {
-			class, ok := sel.Attr("value")
-			if ok {
-				d.undergrad, d.year, d.course, err = parseClassCode(class)
+	err := errors.New("No class or course information found\nTry cate fetch")
+	doc.Find("[name='class']").
+		EachWithBreak(func(_ int, sel *goquery.Selection) bool {
+			if _, ok := sel.Attr("checked"); ok {
+				class, ok := sel.Attr("value")
+				if ok {
+					d.undergrad, d.year, d.course, err = parseClassCode(class)
+				}
+				return false
 			}
-			return false
-		}
-		return true
-	})
+			return true
+		})
 	return err
 }
 

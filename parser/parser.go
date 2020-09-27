@@ -17,6 +17,7 @@ func loadFile() (*goquery.Document, error) {
 	return goquery.NewDocumentFromReader(f)
 }
 
+//Init initialises all singletons when a new cate.html file is loaded in
 func Init() {
 	doc, err := loadFile()
 	if err != nil {
@@ -26,6 +27,7 @@ func Init() {
 	if err != nil {
 		log.Println(err)
 	}
+	info.getName(doc)
 	fmt.Println(*info)
 }
 
