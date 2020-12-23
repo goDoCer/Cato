@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -38,7 +37,7 @@ type Task struct {
 	files    []string //The links to notes for the task
 }
 
-//GetModules auto loads the modules in a given year and all of their current tasks
+//GetModules auto loads the modules in a term and all of their current tasks
 func GetModules(doc *goquery.Document) []*Module {
 	modules := make([]*Module, 0)
 	doc.Find("[style='border: 2px solid blue']").Each(
@@ -58,7 +57,6 @@ func parseModule(sel *goquery.Selection) *Module {
 			day += days
 			task := parseTask(sel, day)
 			if task != nil {
-				fmt.Println(*task)
 				tasks = append(tasks, task)
 			}
 		},

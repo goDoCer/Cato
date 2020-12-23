@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/Akshat-Tripathi/cateCli/parser"
 )
 
@@ -13,5 +15,7 @@ func main() {
 	// 	panic(err)
 	// }
 	doc := parser.L()
-	parser.GetModules(doc)
+	modules := parser.GetModules(doc)
+	fmt.Println(parser.DownloadModule(modules[2]))
+
 }
