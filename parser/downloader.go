@@ -8,12 +8,7 @@ const pageLocation = "cate.html"
 
 //TODO only save the details needed rather than the entire file
 func Download() error {
-	s, err := loadSecrets()
-	if err != nil {
-		return err
-	}
-	auth := getAuth(s)
-	resp, err := login(auth)
+	resp, err := login(getAuth(s), cateURL)
 	if err != nil {
 		return err
 	}
@@ -23,4 +18,8 @@ func Download() error {
 		return err
 	}
 	return ioutil.WriteFile(pageLocation, html, 0644)
+}
+
+func downloadTimeTable() error {
+
 }
