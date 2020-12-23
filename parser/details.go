@@ -3,6 +3,7 @@ package parser
 import (
 	"errors"
 	"strconv"
+	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -12,12 +13,13 @@ var info = new(details)
 
 type details struct {
 	name      string
+	shortcode string
 	undergrad bool
 	year      int
 	course    int
 }
 
-//enum for the different courseTypes
+//enum for the different course types
 const (
 	comp = iota + 1
 	jmc
@@ -31,22 +33,26 @@ const (
 	bio
 )
 
-func (d *details) getName(doc *goquery.Document) {
-	d.name = doc.Find("[style='padding-left: 5px; text-align: left;'][colspan='3']").
+func getName(doc *goquery.Document) {
+	info.name = doc.Find("[style='padding-left: 5px; text-align: left;'][colspan='3']").
 		First().
 		Children().
 		First().
 		Text()
 }
 
-func (d *details) getYearAndCourse(doc *goquery.Document) error {
+func getShortcode(doc *goquery.Document) {
+	info.shortcode = strings.Replace(doc.Find("title").Text(), "CATe - ", "", 1)
+}
+
+func getYearAndCourse(doc *goquery.Document) error {
 	err := errors.New("No class or course information found\nTry cate fetch")
 	doc.Find("[name='class']").
 		EachWithBreak(func(_ int, sel *goquery.Selection) bool {
 			if _, ok := sel.Attr("checked"); ok {
 				class, ok := sel.Attr("value")
 				if ok {
-					d.undergrad, d.year, d.course, err = parseClassCode(class)
+					info.undergrad, info.year, info.course, err = parseClassCode(class)
 				}
 				return false
 			}

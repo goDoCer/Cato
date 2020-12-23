@@ -23,10 +23,11 @@ func Init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = info.getYearAndCourse(doc)
+	err = getYearAndCourse(doc)
 	if err != nil {
 		log.Println(err)
 	}
-	info.getName(doc)
+	getName(doc)
+	getShortcode(doc)
 	fmt.Println(*info)
 }
