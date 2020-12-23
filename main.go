@@ -6,4 +6,7 @@ import (
 
 func main() {
 	parser.Init()
+	// if err := parser.Download(); err != nil {
+	// 	panic(err)
+	// }
 }

@@ -28,6 +28,7 @@ func Init() {
 		log.Println(err)
 	}
 	getName(doc)
+	getTerm(doc)
 	getShortcode(doc)
 	fmt.Println(*info)
 }

@@ -6,6 +6,7 @@ import (
 
 const pageLocation = "cate.html"
 
+//TODO only save the details needed rather than the entire file
 func Download() error {
 	s, err := loadSecrets()
 	if err != nil {

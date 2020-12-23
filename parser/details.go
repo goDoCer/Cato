@@ -2,6 +2,7 @@ package parser
 
 import (
 	"errors"
+	"log"
 	"strconv"
 	"strings"
 
@@ -17,6 +18,7 @@ type details struct {
 	undergrad bool
 	year      int
 	course    int
+	term      int
 }
 
 //enum for the different course types
@@ -43,6 +45,23 @@ func getName(doc *goquery.Document) {
 
 func getShortcode(doc *goquery.Document) {
 	info.shortcode = strings.Replace(doc.Find("title").Text(), "CATe - ", "", 1)
+}
+
+func getTerm(doc *goquery.Document) {
+	doc.Find("[name='period']").EachWithBreak(func(_ int, sel *goquery.Selection) bool {
+		if _, ok := sel.Attr("checked"); ok {
+			term, ok := sel.Attr("value")
+			if ok {
+				termInt, err := strconv.Atoi(term)
+				if err != nil {
+					log.Println("Term is not an int")
+				}
+				info.term = termInt
+			}
+			return false
+		}
+		return true
+	})
 }
 
 func getYearAndCourse(doc *goquery.Document) error {
