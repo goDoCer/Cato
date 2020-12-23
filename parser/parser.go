@@ -8,27 +8,41 @@ import (
 func Init() {
 	err := loadInfo()
 	if err != nil {
-		doc, err := downloadHome()
-		if err != nil {
-			log.Fatal(err)
-		}
-		err = getYearAndCourse(doc)
-		if err != nil {
-			log.Println(err)
-		}
-		getName(doc)
-		getTerm(doc)
-		getShortcode(doc)
-		storeInfo()
+		fetchInfo()
 	}
 
 	err = loadModules()
 	if err != nil {
-		doc, err := downloadTimeTable()
-		if err != nil {
-			log.Fatal(err)
-		}
-		getModules(doc)
-		storeModules()
+		fetchModules()
 	}
+}
+
+//Fetch clears the stored cache and replaces it with up to date information
+func Fetch() {
+	fetchInfo()
+	fetchModules()
+}
+
+func fetchInfo() {
+	doc, err := downloadHome()
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = getYearAndCourse(doc)
+	if err != nil {
+		log.Println(err)
+	}
+	getName(doc)
+	getTerm(doc)
+	getShortcode(doc)
+	storeInfo()
+}
+
+func fetchModules() {
+	doc, err := downloadTimeTable()
+	if err != nil {
+		log.Fatal(err)
+	}
+	getModules(doc)
+	storeModules()
 }
