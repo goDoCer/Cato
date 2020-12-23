@@ -10,8 +10,8 @@ func getAuth(s secrets) string {
 	return "Basic " + s["Auth"]
 }
 
-func login(auth string) (*http.Response, error) {
-	req, err := http.NewRequest("GET", cateURL, nil)
+func login(auth, url string) (*http.Response, error) {
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
