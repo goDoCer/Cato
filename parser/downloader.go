@@ -25,6 +25,7 @@ func Download() error {
 	return ioutil.WriteFile(pageLocation, html, 0644)
 }
 
+//DownloadTimeTable needs info to be initialised before being called
 func DownloadTimeTable() error {
 	//Current currentYear is the currentYear of last September
 	var currentYear int

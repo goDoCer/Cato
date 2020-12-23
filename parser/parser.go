@@ -8,8 +8,8 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func loadFile() (*goquery.Document, error) {
-	f, err := os.Open(pageLocation)
+func loadFile(path string) (*goquery.Document, error) {
+	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
@@ -19,7 +19,7 @@ func loadFile() (*goquery.Document, error) {
 
 //Init initialises all singletons when a new cate.html file is loaded in
 func Init() {
-	doc, err := loadFile()
+	doc, err := loadFile(pageLocation)
 	if err != nil {
 		log.Fatal(err)
 	}

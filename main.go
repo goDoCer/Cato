@@ -8,8 +8,10 @@ func main() {
 	// if err := parser.Download(); err != nil {
 	// 	panic(err)
 	// }
+	// parser.Init()
 	// if err := parser.DownloadTimeTable(); err != nil {
 	// 	panic(err)
 	// }
-	parser.Init()
+	doc := parser.L()
+	parser.GetModules(doc)
 }
