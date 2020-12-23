@@ -14,7 +14,7 @@ func init() {
 
 const (
 	cateURL      = "https://cate.doc.ic.ac.uk"
-	timeTableURL = cateURL + "/timetable.cgi?keyt=%s:%s:%s:%s"
+	timeTableURL = cateURL + "/timetable.cgi?keyt=%d:%d:%s:%s"
 )
 
 var auth string

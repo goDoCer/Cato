@@ -15,6 +15,7 @@ var info = new(details)
 type details struct {
 	name      string
 	shortcode string
+	code      string
 	undergrad bool
 	year      int
 	course    int
@@ -71,6 +72,7 @@ func getYearAndCourse(doc *goquery.Document) error {
 			if _, ok := sel.Attr("checked"); ok {
 				class, ok := sel.Attr("value")
 				if ok {
+					info.code = class
 					info.undergrad, info.year, info.course, err = parseClassCode(class)
 				}
 				return false

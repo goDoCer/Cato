@@ -8,5 +8,8 @@ func main() {
 	// if err := parser.Download(); err != nil {
 	// 	panic(err)
 	// }
+	// if err := parser.DownloadTimeTable(); err != nil {
+	// 	panic(err)
+	// }
 	parser.Init()
 }
