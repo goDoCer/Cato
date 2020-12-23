@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"bytes"
 	"encoding/json"
 	"io/ioutil"
 	"log"
@@ -83,7 +84,11 @@ func parseTask(sel *goquery.Selection, day int) *Task {
 		func(_ int, sel *goquery.Selection) {
 			file, exists := sel.Attr("href")
 			if exists && !strings.Contains(file, "mailto") {
-				files = append(files, file)
+				if strings.Contains(file, "given") {
+					files = append(files, getGivenFiles(file)...)
+				} else {
+					files = append(files, file)
+				}
 			}
 		},
 	)
@@ -96,6 +101,30 @@ func parseTask(sel *goquery.Selection, day int) *Task {
 		Deadline: day,
 		Files:    files,
 	}
+}
+
+//Some files are "given" and so are on a different page than others
+//This function parses that page and returns all the files on it
+func getGivenFiles(url string) []string {
+	url = cateURL + "/" + url
+	data, err := get(url)
+	if err != nil {
+		log.Println("Error retrieving file from url:", url)
+		return []string{}
+	}
+	doc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(data))
+	if err != nil {
+		log.Println("Couldn't parse file from url:", url)
+		return []string{}
+	}
+	files := make([]string, 0)
+	doc.Find("[href]").Each(func(_ int, sel *goquery.Selection) {
+		file, _ := sel.Attr("href")
+		if strings.Contains(file, "showfile") {
+			files = append(files, file)
+		}
+	})
+	return files
 }
 
 //stores the module struct in modules.json
