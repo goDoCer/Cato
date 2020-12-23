@@ -11,11 +11,6 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-const (
-	pageLocation      = "cate.html"
-	timetableLocation = "table.html"
-)
-
 func get(url string) ([]byte, error) {
 	resp, err := login(url)
 	if err != nil {
@@ -71,12 +66,12 @@ func downloadTimeTable() (*goquery.Document, error) {
 //It stops downloading as soon as it fails once
 func downloadModule(module *Module) error {
 	var err error
-	location := "files/" + formatName(module.name) + "/"
-	for _, task := range module.tasks {
-		for _, file := range task.files {
-			err = download(cateURL+"/"+file, location+formatName(task.name)+".pdf")
+	location := "files/" + formatName(module.Name) + "/"
+	for _, task := range module.Tasks {
+		for _, file := range task.Files {
+			err = download(cateURL+"/"+file, location+formatName(task.Name)+".pdf")
 			if err != nil {
-				log.Println("Error downloading module: " + module.name)
+				log.Println("Error downloading module: " + module.Name)
 				return err
 			}
 		}

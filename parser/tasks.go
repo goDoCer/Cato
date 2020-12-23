@@ -1,6 +1,9 @@
 package parser
 
 import (
+	"encoding/json"
+	"io/ioutil"
+	"log"
 	"regexp"
 	"strconv"
 	"strings"
@@ -14,38 +17,40 @@ const (
 	Individual
 	Unassessed
 	UnassessedSub
+	modulePath = "modules.json"
 )
 
-var coloursToGroups = map[string]int{
-	"#f0ccf0": Group,
-	"#ccffcc": Individual,
-	"white":   Unassessed,
-	"#cdcdcd": UnassessedSub,
-}
+var (
+	coloursToGroups = map[string]int{
+		"#f0ccf0": Group,
+		"#ccffcc": Individual,
+		"white":   Unassessed,
+		"#cdcdcd": UnassessedSub,
+	}
+	Modules = make([]*Module, 0)
+)
 
 //Module represents a module for example Reasoning about Programs
 type Module struct {
-	name  string
-	tasks []*Task
+	Name  string
+	Tasks []*Task
 }
 
 //Task represents a block in the cate timetable
 type Task struct {
-	name     string
-	class    int
-	deadline int
-	files    []string //The links to notes for the task
+	Name     string
+	Class    int
+	Deadline int
+	Files    []string //The links to notes for the task
 }
 
-//GetModules auto loads the modules in a term and all of their current tasks
-func GetModules(doc *goquery.Document) []*Module {
-	modules := make([]*Module, 0)
+//getModules auto loads the modules in a term and all of their current tasks
+func getModules(doc *goquery.Document) {
 	doc.Find("[style='border: 2px solid blue']").Each(
 		func(_ int, sel *goquery.Selection) {
-			modules = append(modules, parseModule(sel))
+			Modules = append(Modules, parseModule(sel))
 		},
 	)
-	return modules
 }
 
 func parseModule(sel *goquery.Selection) *Module {
@@ -62,8 +67,8 @@ func parseModule(sel *goquery.Selection) *Module {
 		},
 	)
 	return &Module{
-		name:  sel.Find("b").Text(),
-		tasks: tasks,
+		Name:  sel.Find("b").Text(),
+		Tasks: tasks,
 	}
 }
 
@@ -86,14 +91,29 @@ func parseTask(sel *goquery.Selection, day int) *Task {
 	space := regexp.MustCompile(`\s+`)
 	s := space.ReplaceAllString(sel.Text(), " ")
 	return &Task{
-		name:     strings.TrimSpace(s),
-		class:    coloursToGroups[colour],
-		deadline: day,
-		files:    files,
+		Name:     strings.TrimSpace(s),
+		Class:    coloursToGroups[colour],
+		Deadline: day,
+		Files:    files,
 	}
 }
 
-// func L() *goquery.Document {
-// 	doc, _ := loadFile("table.html")
-// 	return doc
-// }
+//stores the module struct in modules.json
+func storeModules() {
+	data, err := json.MarshalIndent(Modules, "", "\t")
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = ioutil.WriteFile(modulePath, data, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func loadModules() error {
+	data, err := ioutil.ReadFile(modulePath)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(data, &Modules)
+}

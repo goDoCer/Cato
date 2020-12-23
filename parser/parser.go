@@ -7,19 +7,28 @@ import (
 // Init initialises all singletons when a new cate.html file is loaded in
 func Init() {
 	err := loadInfo()
-	if err == nil {
-		return
-	}
-	doc, err := downloadHome()
 	if err != nil {
-		log.Fatal(err)
+		doc, err := downloadHome()
+		if err != nil {
+			log.Fatal(err)
+		}
+		err = getYearAndCourse(doc)
+		if err != nil {
+			log.Println(err)
+		}
+		getName(doc)
+		getTerm(doc)
+		getShortcode(doc)
+		storeInfo()
 	}
-	err = getYearAndCourse(doc)
+
+	err = loadModules()
 	if err != nil {
-		log.Println(err)
+		doc, err := downloadTimeTable()
+		if err != nil {
+			log.Fatal(err)
+		}
+		getModules(doc)
+		storeModules()
 	}
-	getName(doc)
-	getTerm(doc)
-	getShortcode(doc)
-	storeInfo()
 }
