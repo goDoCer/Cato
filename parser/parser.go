@@ -1,25 +1,16 @@
 package parser
 
 import (
-	"fmt"
 	"log"
-	"os"
-
-	"github.com/PuerkitoBio/goquery"
 )
 
-func loadFile(path string) (*goquery.Document, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	return goquery.NewDocumentFromReader(f)
-}
-
-//Init initialises all singletons when a new cate.html file is loaded in
+// Init initialises all singletons when a new cate.html file is loaded in
 func Init() {
-	doc, err := loadFile(pageLocation)
+	err := loadInfo()
+	if err == nil {
+		return
+	}
+	doc, err := downloadHome()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -30,5 +21,5 @@ func Init() {
 	getName(doc)
 	getTerm(doc)
 	getShortcode(doc)
-	fmt.Println(*info)
+	storeInfo()
 }

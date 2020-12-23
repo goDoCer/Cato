@@ -1,7 +1,9 @@
 package parser
 
 import (
+	"encoding/json"
 	"errors"
+	"io/ioutil"
 	"log"
 	"strconv"
 	"strings"
@@ -13,13 +15,13 @@ import (
 var info = new(details)
 
 type details struct {
-	name      string
-	shortcode string
-	code      string
-	undergrad bool
-	year      int
-	course    int
-	term      int
+	Name      string
+	Shortcode string
+	Code      string
+	Undergrad bool
+	Year      int
+	Course    int
+	Term      int
 }
 
 //enum for the different course types
@@ -36,8 +38,27 @@ const (
 	bio
 )
 
+func loadInfo() error {
+	data, err := ioutil.ReadFile("info.json")
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(data, &info)
+}
+
+func storeInfo() {
+	data, err := json.Marshal(info)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = ioutil.WriteFile("info.json", data, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func getName(doc *goquery.Document) {
-	info.name = doc.Find("[style='padding-left: 5px; text-align: left;'][colspan='3']").
+	info.Name = doc.Find("[style='padding-left: 5px; text-align: left;'][colspan='3']").
 		First().
 		Children().
 		First().
@@ -45,7 +66,7 @@ func getName(doc *goquery.Document) {
 }
 
 func getShortcode(doc *goquery.Document) {
-	info.shortcode = strings.Replace(doc.Find("title").Text(), "CATe - ", "", 1)
+	info.Shortcode = strings.Replace(doc.Find("title").Text(), "CATe - ", "", 1)
 }
 
 func getTerm(doc *goquery.Document) {
@@ -57,7 +78,7 @@ func getTerm(doc *goquery.Document) {
 				if err != nil {
 					log.Println("Term is not an int")
 				}
-				info.term = termInt
+				info.Term = termInt
 			}
 			return false
 		}
@@ -72,8 +93,8 @@ func getYearAndCourse(doc *goquery.Document) error {
 			if _, ok := sel.Attr("checked"); ok {
 				class, ok := sel.Attr("value")
 				if ok {
-					info.code = class
-					info.undergrad, info.year, info.course, err = parseClassCode(class)
+					info.Code = class
+					info.Undergrad, info.Year, info.Course, err = parseClassCode(class)
 				}
 				return false
 			}

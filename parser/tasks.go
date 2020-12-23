@@ -93,7 +93,7 @@ func parseTask(sel *goquery.Selection, day int) *Task {
 	}
 }
 
-func L() *goquery.Document {
-	doc, _ := loadFile("table.html")
-	return doc
-}
+// func L() *goquery.Document {
+// 	doc, _ := loadFile("table.html")
+// 	return doc
+// }
