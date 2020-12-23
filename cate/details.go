@@ -1,4 +1,4 @@
-package parser
+package cate
 
 import (
 	"encoding/json"
