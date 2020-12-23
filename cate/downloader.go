@@ -29,7 +29,6 @@ func download(url, location string) error {
 	if err != nil {
 		return err
 	}
-	html = []byte("hello world")
 	fmt.Println(location)
 	return ioutil.WriteFile(location, html, 0644)
 }
