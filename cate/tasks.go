@@ -83,7 +83,7 @@ func parseTask(sel *goquery.Selection, day int) *Task {
 	sel.Find("[href]").Each(
 		func(_ int, sel *goquery.Selection) {
 			file, exists := sel.Attr("href")
-			if exists && !strings.Contains(file, "mailto") {
+			if exists && !strings.Contains(file, "mailto") && !strings.Contains(file, "handins") {
 				if strings.Contains(file, "given") {
 					files = append(files, getGivenFiles(file)...)
 				} else {
