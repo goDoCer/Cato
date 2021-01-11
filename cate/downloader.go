@@ -47,10 +47,10 @@ func downloadTimeTable() (*goquery.Document, error) {
 	//Current currentYear is the year of last September
 	var currentYear int
 	now := time.Now()
-	currentYear = now.Year() + 1
+	currentYear = now.Year() - 1
 	if now.After(time.Date(now.Year(), time.September, 1, 0, 0, 0, 0,
 		now.Location())) {
-		currentYear--
+		currentYear++
 	}
 
 	timetable, err := get(fmt.Sprintf(timeTableURL, currentYear, info.Term,

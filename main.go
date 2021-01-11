@@ -11,8 +11,6 @@ import (
 
 func main() {
 	cate.Init()
-	// initCommand := flag.NewFlagSet("init", flag.ExitOnError)
-	// fetchCommand := flag.NewFlagSet("fetch", flag.ExitOnError)
 	getCommand := flag.NewFlagSet("get", flag.ExitOnError)
 
 	//get subcommands

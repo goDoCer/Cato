@@ -63,6 +63,7 @@ func fetchModules() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	//TODO figure out if the page has given an error
 	getModules(doc)
 	storeModules()
 }
