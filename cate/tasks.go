@@ -3,11 +3,13 @@ package cate
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -28,6 +30,7 @@ var (
 		"white":   Unassessed,
 		"#cdcdcd": UnassessedSub,
 	}
+	//Modules represents all the courses in the current term
 	Modules = make([]*Module, 0)
 )
 
@@ -41,7 +44,7 @@ type Module struct {
 type Task struct {
 	Name     string
 	Class    int
-	Deadline int
+	Deadline string   //A string representing time as DD/MM//YY
 	Files    []string //The links to notes for the task
 }
 
@@ -60,6 +63,7 @@ func parseModule(sel *goquery.Selection) *Module {
 	sel.Parent().Find("[colspan]").Each(
 		func(_ int, sel *goquery.Selection) {
 			days, _ := strconv.Atoi(sel.AttrOr("colspan", "0"))
+			fmt.Println(days)
 			day += days
 			task := parseTask(sel, day)
 			if task != nil {
@@ -98,7 +102,7 @@ func parseTask(sel *goquery.Selection, day int) *Task {
 	return &Task{
 		Name:     strings.TrimSpace(s),
 		Class:    coloursToGroups[colour],
-		Deadline: day,
+		Deadline: convertDaysToDates(day).Format(time.ANSIC),
 		Files:    files,
 	}
 }
