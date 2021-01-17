@@ -1,14 +1,41 @@
 package cate
 
 import (
+	"bufio"
+	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
+	"syscall"
+
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 func init() {
 	if err := getAuth(); err != nil {
-		panic(err)
+		fmt.Println("Enter your shortcode")
+		reader := bufio.NewReader(os.Stdin)
+		shortcode, _, err := reader.ReadLine()
+		if err != nil {
+			panic(err)
+		}
+
+		fmt.Println("Enter your password")
+		bytePassword, err := terminal.ReadPassword(int(syscall.Stdin))
+		if err != nil {
+			panic(err)
+		}
+		str := base64.StdEncoding.EncodeToString([]byte(string(shortcode) + ":" + string(bytePassword)))
+		auth = "Basic" + str
+		data, _ := json.Marshal(map[string]string{
+			"Auth": str,
+		})
+		err = ioutil.WriteFile("secrets.json", data, 0644)
+		if err != nil {
+			fmt.Println("Could not save login details because", err)
+		}
 	}
 }
 
