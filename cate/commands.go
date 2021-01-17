@@ -64,6 +64,7 @@ func fetchModules() {
 		log.Fatal(err)
 	}
 	//TODO figure out if the page has given an error
+	termStart = getTermStart(doc)
 	getModules(doc)
 	storeModules()
 }

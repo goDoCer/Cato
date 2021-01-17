@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"log"
 	"strings"
-	"time"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -32,7 +31,6 @@ func download(url, location string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(location)
 	return ioutil.WriteFile(location, html, 0644)
 }
 
@@ -46,14 +44,7 @@ func downloadHome() (*goquery.Document, error) {
 
 //DownloadTimeTable needs info to be initialised before being called
 func downloadTimeTable() (*goquery.Document, error) {
-	//Current currentYear is the year of last September
-	var currentYear int
-	now := time.Now()
-	currentYear = now.Year() - 1
-	if now.After(time.Date(now.Year(), time.September, 1, 0, 0, 0, 0,
-		now.Location())) {
-		currentYear++
-	}
+	currentYear := getAcademicYear()
 
 	timetable, err := get(fmt.Sprintf(timeTableURL, currentYear, info.Term,
 		info.Code, info.Shortcode))

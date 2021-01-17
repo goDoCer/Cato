@@ -11,6 +11,8 @@ import (
 /* This file contains functions to convert between "cate time" and real time.
  */
 
+const hoursInADay = 24
+
 var (
 	//This variable is used to cache the results of getTermStart() when it is called
 	//It will only be set during a cate fetch
@@ -55,6 +57,15 @@ func getTermStart(doc *goquery.Document) time.Time {
 	return t.AddDate(0, 0, -2)
 }
 
-func convertDaysToDates(days int) time.Time {
+func convertDaysToDate(days int) time.Time {
 	return termStart.AddDate(0, 0, days)
+}
+
+func convertDateToDays(date time.Time) int {
+	return int(date.Sub(termStart).Hours()) / hoursInADay
+}
+
+func isWeekend() bool {
+	day := time.Now().Weekday()
+	return day == time.Saturday || day == time.Sunday
 }

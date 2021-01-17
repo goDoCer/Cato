@@ -3,7 +3,7 @@ package cate
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
+	"errors"
 	"io/ioutil"
 	"log"
 	"regexp"
@@ -20,6 +20,7 @@ const (
 	Individual
 	Unassessed
 	UnassessedSub
+
 	modulePath = "modules.json"
 )
 
@@ -48,27 +49,49 @@ type Task struct {
 	Files    []string //The links to notes for the task
 }
 
+func findModule(mod *Module) (int, error) {
+	for i, m := range Modules {
+		if m.Name == mod.Name {
+			return i, nil
+		}
+	}
+	return 0, errors.New("Module not found")
+}
+
 //getModules auto loads the modules in a term and all of their current tasks
 func getModules(doc *goquery.Document) {
 	doc.Find("[style='border: 2px solid blue']").Each(
 		func(_ int, sel *goquery.Selection) {
-			Modules = append(Modules, parseModule(sel))
+			mod := parseModule(sel)
+			if i, err := findModule(mod); err != nil {
+				Modules = append(Modules, mod)
+			} else {
+				Modules[i] = mod
+			}
 		},
 	)
 }
 
 func parseModule(sel *goquery.Selection) *Module {
+	today := convertDateToDays(time.Now())
+	weekend := isWeekend()
 	day := 0
 	tasks := make([]*Task, 0)
 	sel.Parent().Find("[colspan]").Each(
 		func(_ int, sel *goquery.Selection) {
 			days, _ := strconv.Atoi(sel.AttrOr("colspan", "0"))
-			fmt.Println(days)
+			//Filter out all blank space
+			colour, exists := sel.Attr("bgcolor")
 			day += days
-			task := parseTask(sel, day)
-			if task != nil {
-				tasks = append(tasks, task)
+			if !exists {
+				return
 			}
+			//This accounts for the "blue shift" on weekends
+			if weekend && day-days < today {
+				day--
+			}
+			task := parseTask(sel, day, colour)
+			tasks = append(tasks, task)
 		},
 	)
 	return &Module{
@@ -77,12 +100,7 @@ func parseModule(sel *goquery.Selection) *Module {
 	}
 }
 
-func parseTask(sel *goquery.Selection, day int) *Task {
-	//Filter out all blank space
-	colour, exists := sel.Attr("bgcolor")
-	if !exists {
-		return nil
-	}
+func parseTask(sel *goquery.Selection, day int, colour string) *Task {
 	files := make([]string, 0)
 	sel.Find("[href]").Each(
 		func(_ int, sel *goquery.Selection) {
@@ -102,7 +120,7 @@ func parseTask(sel *goquery.Selection, day int) *Task {
 	return &Task{
 		Name:     strings.TrimSpace(s),
 		Class:    coloursToGroups[colour],
-		Deadline: convertDaysToDates(day).Format(time.ANSIC),
+		Deadline: convertDaysToDate(day).Format(time.ANSIC),
 		Files:    files,
 	}
 }
