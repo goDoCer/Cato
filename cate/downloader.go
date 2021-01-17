@@ -11,6 +11,9 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+/* This file contains functions related to downloading and parsing cate webpages
+ */
+
 func get(url string) ([]byte, error) {
 	resp, err := login(url)
 	if err != nil {
@@ -33,7 +36,6 @@ func download(url, location string) error {
 	return ioutil.WriteFile(location, html, 0644)
 }
 
-//TODO only save the details needed rather than the entire file
 func downloadHome() (*goquery.Document, error) {
 	home, err := get(cateURL)
 	if err != nil {
