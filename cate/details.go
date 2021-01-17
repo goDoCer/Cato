@@ -11,6 +11,11 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+/* This file stores the details of a student i.e. relevant information found on
+   the cate homepage.
+   See the *details* struct for the information stored.
+*/
+
 //info is a singleton containing the details of the user
 var info = new(details)
 
@@ -90,7 +95,7 @@ func getYearAndCourse(doc *goquery.Document) error {
 	err := errors.New("No class or course information found\nTry cate fetch")
 	doc.Find("[name='class']").
 		EachWithBreak(func(_ int, sel *goquery.Selection) bool {
-			if _, ok := sel.Attr("checked"); ok {
+			if _, ok := sel.Attr("style"); ok {
 				class, ok := sel.Attr("value")
 				if ok {
 					info.Code = class
