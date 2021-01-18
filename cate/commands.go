@@ -44,30 +44,26 @@ func Fetch() {
 	fetchModules()
 }
 
-//DownloadModule downloads every file in a module
-//It stops downloading as soon as it fails once
-func DownloadModule(module *Module) {
+//DownloadTask downloads a task from a module
+func DownloadTask(task *Task, mod *Module) {
+	if task.Downloaded {
+		return
+	}
 	//Make sure the location exists
-	err := checkDir("files/" + module.Name)
+	dir := "files/" + strings.ReplaceAll(mod.Name, ":", "")
+	err := checkDir(dir)
 	if err != nil {
-		log.Fatalln("Failed to create directory", "files/"+module.Name)
+		log.Fatalln("Failed to create directory", dir, err)
 	}
 	defer storeModules()
-	location := "files/" + strings.ReplaceAll(module.Name, ":", "") + "/"
-	for _, task := range module.Tasks {
-		if task.Downloaded {
-			continue
+	for _, link := range task.Files {
+		err := downloadFile(cateURL+"/"+link, dir+"/")
+		if err != nil {
+			fmt.Println("Error downloading module: "+mod.Name, err)
+			return
 		}
-		for _, link := range task.Files {
-			err = downloadFile(cateURL+"/"+link, location)
-			if err != nil {
-				fmt.Println("Error downloading module: "+module.Name, err)
-				return
-			}
-		}
-		task.Downloaded = true
 	}
-
+	task.Downloaded = true
 }
 
 func fetchInfo() {
