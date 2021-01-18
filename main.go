@@ -30,6 +30,8 @@ func main() {
 		cate.Init()
 	case "fetch":
 		cate.Fetch()
+	case "ls":
+		list(true, "")
 	case "login":
 		cate.Login()
 	case "get":
@@ -78,7 +80,7 @@ func main() {
 
 func findModule(name string) (module *cate.Module, err error) {
 	for _, v := range cate.Modules {
-		if strings.Split(v.Name, " ")[0] == name {
+		if strings.Split(v.Name, " ")[0] == name || v.Name == name {
 			return v, nil
 		}
 	}

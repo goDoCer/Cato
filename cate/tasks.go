@@ -45,7 +45,7 @@ type Task struct {
 	Name       string
 	Class      int
 	Downloaded bool
-	Deadline   string   //A string representing time
+	Deadline   time.Time
 	Files      []string //Contains links to all associated files
 }
 
@@ -130,7 +130,7 @@ func parseTask(sel *goquery.Selection, day int, colour string) *Task {
 	return &Task{
 		Name:     strings.TrimSpace(s),
 		Class:    coloursToGroups[colour],
-		Deadline: convertDaysToDate(day).Format(time.ANSIC),
+		Deadline: convertDaysToDate(day),
 		Files:    files,
 	}
 }
