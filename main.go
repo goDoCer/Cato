@@ -25,6 +25,8 @@ func main() {
 		cate.Login()
 	case "get":
 		Get(getArg(2, os.Args), getArg(3, os.Args))
+	case "show":
+		Show(getArg(2, os.Args), getArg(3, os.Args))
 	default:
 		os.Exit(1)
 	}

@@ -30,10 +30,10 @@ func get(url string) ([]byte, error) {
 	return html, nil
 }
 
-func downloadFile(url, location string) error {
+func downloadFile(url, location string) (string, error) {
 	resp, err := login(url)
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer resp.Body.Close()
 	html, err := ioutil.ReadAll(resp.Body)
@@ -41,12 +41,12 @@ func downloadFile(url, location string) error {
 	filename := extractFilename.FindAllStringSubmatch(contentHeader, 1)[0][1]
 	if filename == "" {
 		fmt.Println(resp.Header)
-		return errors.New("No filename found")
+		return "", errors.New("No filename found")
 	}
 	if err != nil {
-		return err
+		return "", err
 	}
-	return ioutil.WriteFile(location+"/"+filename, html, 0644)
+	return filename, ioutil.WriteFile(location+"/"+filename, html, 0644)
 }
 
 func downloadHome() (*goquery.Document, error) {

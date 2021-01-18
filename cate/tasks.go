@@ -46,7 +46,8 @@ type Task struct {
 	Class      int
 	Downloaded bool
 	Deadline   time.Time
-	Files      []string //Contains links to all associated files
+	Links      []string //Contains links to all associated files
+	FileNames  []string
 }
 
 func findModule(mod *Module) (int, error) {
@@ -128,10 +129,11 @@ func parseTask(sel *goquery.Selection, day int, colour string) *Task {
 	space := regexp.MustCompile(`\s+`)
 	s := space.ReplaceAllString(sel.Text(), " ")
 	return &Task{
-		Name:     strings.TrimSpace(s),
-		Class:    coloursToGroups[colour],
-		Deadline: convertDaysToDate(day),
-		Files:    files,
+		Name:      strings.TrimSpace(s),
+		Class:     coloursToGroups[colour],
+		Deadline:  convertDaysToDate(day),
+		Links:     files,
+		FileNames: make([]string, len(files)),
 	}
 }
 

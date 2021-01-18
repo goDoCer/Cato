@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/Akshat-Tripathi/cateCli/cate"
+	"github.com/Akshat-Tripathi/cateCli/fileopen"
 	"github.com/fatih/color"
 	"github.com/manifoldco/promptui"
 )
@@ -94,7 +95,7 @@ func getTask(task string, mod *cate.Module) *cate.Task {
 func selectTask(mod *cate.Module) string {
 	tasks := make([]string, 0)
 	for _, task := range mod.Tasks {
-		if len(task.Files) > 0 {
+		if len(task.Links) > 0 {
 			tasks = append(tasks, task.Name)
 		}
 	}
@@ -115,4 +116,15 @@ func Get(module, task string) {
 	mod := getModule(module)
 	tsk := getTask(task, mod)
 	cate.DownloadTask(tsk, mod)
+}
+
+//Show opens all the files in a task
+func Show(module, task string) {
+	mod := getModule(module)
+	tsk := getTask(task, mod)
+	loc := cate.ModulePath(mod)
+	for _, name := range tsk.FileNames {
+		err := fileopen.Open(loc, name)
+		fmt.Println(fmt.Sprintf("\"%s/%s\"", loc, name), err)
+	}
 }
