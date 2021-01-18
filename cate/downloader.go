@@ -79,24 +79,23 @@ func download(url, location string) error {
 
 //Some files are "given" and so are on a different page than others
 //This function parses that page and returns all the files on it
-func getGivenFiles(url string) map[string]string {
+func getGivenFiles(url string) []string {
 	url = cateURL + "/" + url
 	data, err := get(url)
-	files := make(map[string]string)
 	if err != nil {
 		log.Println("Error retrieving file from url:", url)
-		return files
+		return []string{}
 	}
 	doc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(data))
 	if err != nil {
 		log.Println("Couldn't parse file from url:", url)
-		return files
+		return []string{}
 	}
+	files := make([]string, 0)
 	doc.Find("[href]").Each(func(_ int, sel *goquery.Selection) {
 		link, _ := sel.Attr("href")
 		if strings.Contains(link, "showfile") {
-			filename := sel.Text()
-			files[filename] = link
+			files = append(files, link)
 		}
 	})
 	return files

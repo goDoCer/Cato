@@ -44,8 +44,8 @@ type Module struct {
 type Task struct {
 	Name     string
 	Class    int
-	Deadline string            //A string representing time
-	Files    map[string]string //Maps filenames to links to the file
+	Deadline string   //A string representing time
+	Files    []string //Contains links to all associated files
 }
 
 func findModule(mod *Module) (int, error) {
@@ -100,20 +100,16 @@ func parseModule(sel *goquery.Selection) *Module {
 }
 
 func parseTask(sel *goquery.Selection, day int, colour string) *Task {
-	files := make(map[string]string)
+	files := make([]string, 0)
 	//Search all href tags to find links the point to files
 	sel.Find("[href]").Each(
 		func(_ int, sel *goquery.Selection) {
 			link, exists := sel.Attr("href")
 			if exists && !strings.Contains(link, "mailto") && !strings.Contains(link, "handins") {
 				if strings.Contains(link, "given") {
-					givenFiles := getGivenFiles(link)
-					for name, link := range givenFiles {
-						files[name] = link
-					}
+					files = append(files, getGivenFiles(link)...)
 				} else {
-					filename := strings.TrimSpace(sel.Text())
-					files[filename] = link
+					files = append(files, link)
 				}
 			}
 		},
