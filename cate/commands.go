@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 )
 
 // Init initialises all singletons when a new cate.html file is loaded in
@@ -38,12 +39,12 @@ func DownloadModule(module *Module) {
 	if err != nil {
 		log.Fatalln("Failed to create directory", "files/"+module.Name)
 	}
-	location := "files/" + formatName(module.Name) + "/"
+	location := "files/" + strings.ReplaceAll(module.Name, ":", "") + "/"
 	for _, task := range module.Tasks {
-		for _, file := range task.Files {
-			err = download(cateURL+"/"+file, location+formatName(task.Name)+".pdf")
+		for _, link := range task.Files {
+			err = downloadFile(cateURL+"/"+link, location)
 			if err != nil {
-				fmt.Println("Error downloading module: " + module.Name)
+				fmt.Println("Error downloading module: "+module.Name, err)
 			}
 		}
 	}

@@ -2,16 +2,20 @@ package cate
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"regexp"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
-/* This file contains functions related to downloading and parsing cate webpages
+/* This file contains functions related to downloading cate webpages
  */
+
+var extractFilename = regexp.MustCompile("filename=\"(.*)\"")
 
 func get(url string) ([]byte, error) {
 	resp, err := login(url)
@@ -24,6 +28,25 @@ func get(url string) ([]byte, error) {
 		return nil, err
 	}
 	return html, nil
+}
+
+func downloadFile(url, location string) error {
+	resp, err := login(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	html, err := ioutil.ReadAll(resp.Body)
+	contentHeader := resp.Header.Get("Content-Disposition")
+	filename := extractFilename.FindAllStringSubmatch(contentHeader, 1)[0][1]
+	if filename == "" {
+		fmt.Println(resp.Header)
+		return errors.New("No filename found")
+	}
+	if err != nil {
+		return err
+	}
+	return ioutil.WriteFile(location+"/"+filename, html, 0644)
 }
 
 func downloadHome() (*goquery.Document, error) {
@@ -52,10 +75,6 @@ func download(url, location string) error {
 		return err
 	}
 	return ioutil.WriteFile(location, html, 0644)
-}
-
-func formatName(name string) string {
-	return strings.ReplaceAll(name, ":", "")
 }
 
 //Some files are "given" and so are on a different page than others
