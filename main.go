@@ -30,6 +30,8 @@ func main() {
 		cate.Init()
 	case "fetch":
 		cate.Fetch()
+	case "login":
+		cate.Login()
 	case "get":
 		getCommand.Parse(os.Args[2:])
 	case "show":

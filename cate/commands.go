@@ -1,7 +1,9 @@
 package cate
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -22,6 +24,17 @@ func Init() {
 	err = checkDir("files")
 	if err != nil {
 		log.Fatalln("Failed to create files directory")
+	}
+}
+
+//Login allows a user to store their login details
+func Login() {
+	data, _ := json.Marshal(map[string]string{
+		"Auth": strings.Replace(auth, "Basic", "", 1),
+	})
+	err := ioutil.WriteFile("secrets.json", data, 0644)
+	if err != nil {
+		fmt.Println("Could not save login details because", err)
 	}
 }
 

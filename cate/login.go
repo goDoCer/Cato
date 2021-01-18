@@ -14,6 +14,17 @@ import (
 )
 
 func init() {
+	getLoginDetails()
+}
+
+const (
+	cateURL      = "https://cate.doc.ic.ac.uk"
+	timeTableURL = cateURL + "/timetable.cgi?keyt=%d:%d:%s:%s"
+)
+
+var auth string
+
+func getLoginDetails() {
 	if err := getAuth(); err != nil {
 		fmt.Println("Enter your shortcode")
 		reader := bufio.NewReader(os.Stdin)
@@ -29,22 +40,8 @@ func init() {
 		}
 		str := base64.StdEncoding.EncodeToString([]byte(string(shortcode) + ":" + string(bytePassword)))
 		auth = "Basic" + str
-		data, _ := json.Marshal(map[string]string{
-			"Auth": str,
-		})
-		err = ioutil.WriteFile("secrets.json", data, 0644)
-		if err != nil {
-			fmt.Println("Could not save login details because", err)
-		}
 	}
 }
-
-const (
-	cateURL      = "https://cate.doc.ic.ac.uk"
-	timeTableURL = cateURL + "/timetable.cgi?keyt=%d:%d:%s:%s"
-)
-
-var auth string
 
 func login(url string) (*http.Response, error) {
 	req, err := http.NewRequest("GET", url, nil)
