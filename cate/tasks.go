@@ -42,10 +42,11 @@ type Module struct {
 
 //Task represents a block in the cate timetable
 type Task struct {
-	Name     string
-	Class    int
-	Deadline string   //A string representing time
-	Files    []string //Contains links to all associated files
+	Name       string
+	Class      int
+	Downloaded bool
+	Deadline   string   //A string representing time
+	Files      []string //Contains links to all associated files
 }
 
 func findModule(mod *Module) (int, error) {

@@ -39,15 +39,22 @@ func DownloadModule(module *Module) {
 	if err != nil {
 		log.Fatalln("Failed to create directory", "files/"+module.Name)
 	}
+	defer storeModules()
 	location := "files/" + strings.ReplaceAll(module.Name, ":", "") + "/"
 	for _, task := range module.Tasks {
+		if task.Downloaded {
+			continue
+		}
 		for _, link := range task.Files {
 			err = downloadFile(cateURL+"/"+link, location)
 			if err != nil {
 				fmt.Println("Error downloading module: "+module.Name, err)
+				return
 			}
 		}
+		task.Downloaded = true
 	}
+
 }
 
 func fetchInfo() {
