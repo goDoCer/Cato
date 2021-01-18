@@ -31,15 +31,21 @@ func Fetch() {
 }
 
 //DownloadModule downloads every file in a module
+//It stops downloading as soon as it fails once
 func DownloadModule(module *Module) {
 	//Make sure the location exists
 	err := checkDir("files/" + module.Name)
 	if err != nil {
 		log.Fatalln("Failed to create directory", "files/"+module.Name)
 	}
-	err = downloadModule(module)
-	if err != nil {
-		fmt.Println(err)
+	location := "files/" + formatName(module.Name) + "/"
+	for _, task := range module.Tasks {
+		for _, file := range task.Files {
+			err = download(cateURL+"/"+file, location+formatName(task.Name)+".pdf")
+			if err != nil {
+				fmt.Println("Error downloading module: " + module.Name)
+			}
+		}
 	}
 }
 
@@ -65,7 +71,7 @@ func fetchModules() {
 	}
 	//TODO figure out if the page has given an error
 	termStart = getTermStart(doc)
-	getModules(doc)
+	parseModules(doc)
 	storeModules()
 }
 

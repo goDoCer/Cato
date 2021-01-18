@@ -26,14 +26,6 @@ func get(url string) ([]byte, error) {
 	return html, nil
 }
 
-func download(url, location string) error {
-	html, err := get(url)
-	if err != nil {
-		return err
-	}
-	return ioutil.WriteFile(location, html, 0644)
-}
-
 func downloadHome() (*goquery.Document, error) {
 	home, err := get(cateURL)
 	if err != nil {
@@ -54,23 +46,38 @@ func downloadTimeTable() (*goquery.Document, error) {
 	return goquery.NewDocumentFromReader(bytes.NewBuffer(timetable))
 }
 
-//DownloadModule tries to download all tasks in a module in the appropriate folder
-//It stops downloading as soon as it fails once
-func downloadModule(module *Module) error {
-	var err error
-	location := "files/" + formatName(module.Name) + "/"
-	for _, task := range module.Tasks {
-		for _, file := range task.Files {
-			err = download(cateURL+"/"+file, location+formatName(task.Name)+".pdf")
-			if err != nil {
-				log.Println("Error downloading module: " + module.Name)
-				return err
-			}
-		}
+func download(url, location string) error {
+	html, err := get(url)
+	if err != nil {
+		return err
 	}
-	return nil
+	return ioutil.WriteFile(location, html, 0644)
 }
 
 func formatName(name string) string {
 	return strings.ReplaceAll(name, ":", "")
+}
+
+//Some files are "given" and so are on a different page than others
+//This function parses that page and returns all the files on it
+func getGivenFiles(url string) []string {
+	url = cateURL + "/" + url
+	data, err := get(url)
+	if err != nil {
+		log.Println("Error retrieving file from url:", url)
+		return []string{}
+	}
+	doc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(data))
+	if err != nil {
+		log.Println("Couldn't parse file from url:", url)
+		return []string{}
+	}
+	files := make([]string, 0)
+	doc.Find("[href]").Each(func(_ int, sel *goquery.Selection) {
+		file, _ := sel.Attr("href")
+		if strings.Contains(file, "showfile") {
+			files = append(files, file)
+		}
+	})
+	return files
 }

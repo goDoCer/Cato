@@ -1,7 +1,6 @@
 package cate
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
@@ -45,7 +44,7 @@ type Module struct {
 type Task struct {
 	Name     string
 	Class    int
-	Deadline string   //A string representing time as DD/MM//YY
+	Deadline string   //A string representing time
 	Files    []string //The links to notes for the task
 }
 
@@ -58,8 +57,9 @@ func findModule(mod *Module) (int, error) {
 	return 0, errors.New("Module not found")
 }
 
-//getModules auto loads the modules in a term and all of their current tasks
-func getModules(doc *goquery.Document) {
+//parseModules loads the modules in a term and all of their current tasks
+//Any preexisting modules are replaced
+func parseModules(doc *goquery.Document) {
 	doc.Find("[style='border: 2px solid blue']").Each(
 		func(_ int, sel *goquery.Selection) {
 			mod := parseModule(sel)
@@ -102,6 +102,7 @@ func parseModule(sel *goquery.Selection) *Module {
 
 func parseTask(sel *goquery.Selection, day int, colour string) *Task {
 	files := make([]string, 0)
+	//Search all href tags to find links the point to files
 	sel.Find("[href]").Each(
 		func(_ int, sel *goquery.Selection) {
 			file, exists := sel.Attr("href")
@@ -123,30 +124,6 @@ func parseTask(sel *goquery.Selection, day int, colour string) *Task {
 		Deadline: convertDaysToDate(day).Format(time.ANSIC),
 		Files:    files,
 	}
-}
-
-//Some files are "given" and so are on a different page than others
-//This function parses that page and returns all the files on it
-func getGivenFiles(url string) []string {
-	url = cateURL + "/" + url
-	data, err := get(url)
-	if err != nil {
-		log.Println("Error retrieving file from url:", url)
-		return []string{}
-	}
-	doc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(data))
-	if err != nil {
-		log.Println("Couldn't parse file from url:", url)
-		return []string{}
-	}
-	files := make([]string, 0)
-	doc.Find("[href]").Each(func(_ int, sel *goquery.Selection) {
-		file, _ := sel.Attr("href")
-		if strings.Contains(file, "showfile") {
-			files = append(files, file)
-		}
-	})
-	return files
 }
 
 //stores the module struct in modules.json
