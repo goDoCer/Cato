@@ -72,27 +72,36 @@ func parseModules(doc *goquery.Document) {
 	)
 }
 
+//Given a selection containing a module name (in the blue boxes), this finds
+//all tasks within the module
 func parseModule(sel *goquery.Selection) *Module {
 	today := convertDateToDays(time.Now())
-	day := 0
 	tasks := make([]*Task, 0)
-	sel.Parent().Find("[colspan]").Each(
-		func(_ int, sel *goquery.Selection) {
-			days, _ := strconv.Atoi(sel.AttrOr("colspan", "0"))
-			//Filter out all blank space
-			colour, exists := sel.Attr("bgcolor")
-			day += days
-			if !exists {
-				return
-			}
-			//This accounts for the "blue shift" for tasks set before the current day
-			if day-days < today {
-				day--
-			}
-			task := parseTask(sel, day, colour)
-			tasks = append(tasks, task)
-		},
-	)
+	var day int
+	//Get number of rows in module
+	nRows, _ := strconv.Atoi(sel.AttrOr("rowspan", "1"))
+	row := sel.Parent()
+	for i := 0; i < nRows; i++ {
+		day = 0
+		row.Find("[colspan]").Each(
+			func(_ int, sel *goquery.Selection) {
+				days, _ := strconv.Atoi(sel.AttrOr("colspan", "0"))
+				//Filter out all blank space
+				colour, exists := sel.Attr("bgcolor")
+				day += days
+				if !exists {
+					return
+				}
+				//This accounts for the "blue shift" for tasks set before the current day
+				if day-days < today {
+					day--
+				}
+				task := parseTask(sel, day, colour)
+				tasks = append(tasks, task)
+			},
+		)
+		row = row.Next()
+	}
 	return &Module{
 		Name:  sel.Find("b").Text(),
 		Tasks: tasks,
