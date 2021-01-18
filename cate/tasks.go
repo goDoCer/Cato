@@ -74,7 +74,6 @@ func parseModules(doc *goquery.Document) {
 
 func parseModule(sel *goquery.Selection) *Module {
 	today := convertDateToDays(time.Now())
-	weekend := isWeekend()
 	day := 0
 	tasks := make([]*Task, 0)
 	sel.Parent().Find("[colspan]").Each(
@@ -86,8 +85,8 @@ func parseModule(sel *goquery.Selection) *Module {
 			if !exists {
 				return
 			}
-			//This accounts for the "blue shift" on weekends
-			if weekend && day-days < today {
+			//This accounts for the "blue shift" for tasks set before the current day
+			if day-days < today {
 				day--
 			}
 			task := parseTask(sel, day, colour)

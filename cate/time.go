@@ -64,8 +64,3 @@ func convertDaysToDate(days int) time.Time {
 func convertDateToDays(date time.Time) int {
 	return int(date.Sub(termStart).Hours()) / hoursInADay
 }
-
-func isWeekend() bool {
-	day := time.Now().Weekday()
-	return day == time.Saturday || day == time.Sunday
-}
