@@ -1,18 +1,48 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/Akshat-Tripathi/cateCli/cate"
-	"github.com/Akshat-Tripathi/cateCli/fileopen"
 	"github.com/fatih/color"
 	"github.com/manifoldco/promptui"
+	"github.com/urfave/cli"
 )
 
-//List prints out all the modules or all the tasks of a module
+//Fetch downloads the current term's timetable
+func Fetch() *cli.Command {
+	return &cli.Command{
+		Name:  "fetch",
+		Usage: "gets the current timetable information",
+		Action: func(c *cli.Context) error {
+			return cate.Fetch()
+		},
+	}
+}
+
+//Get downloads all the files needed for a particular task
+func Get(module, task string) {
+	mod := getModule(module)
+	tsk := getTask(task, mod)
+	cate.DownloadTask(tsk, mod)
+}
+
+//Show opens all the files in a task
+func Show(module, task string) {
+	mod := getModule(module)
+	tsk := getTask(task, mod)
+	loc := cate.ModulePath(mod)
+	for _, name := range tsk.FileNames {
+		fileopen.Open(loc, name)
+	}
+}
+
+//Ls prints out all the modules or all the tasks of a module
 //If showTask is true then module shouldn't be an empty string
-func List(showTask bool, module string) {
+func Ls(showTask bool, module string) {
 	if !showTask {
 		listModules()
 	} else {
@@ -113,19 +143,11 @@ func selectTask(mod *cate.Module) string {
 	return task
 }
 
-//Get downloads all the files needed for a particular task
-func Get(module, task string) {
-	mod := getModule(module)
-	tsk := getTask(task, mod)
-	cate.DownloadTask(tsk, mod)
-}
-
-//Show opens all the files in a task
-func Show(module, task string) {
-	mod := getModule(module)
-	tsk := getTask(task, mod)
-	loc := cate.ModulePath(mod)
-	for _, name := range tsk.FileNames {
-		fileopen.Open(loc, name)
+func findModule(name string) (module *cate.Module, err error) {
+	for _, v := range cate.Modules {
+		if strings.Split(v.Name, " ")[0] == name || v.Name == name {
+			return v, nil
+		}
 	}
+	return nil, errors.New("Couldn't find module " + name)
 }

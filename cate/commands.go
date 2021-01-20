@@ -39,9 +39,12 @@ func Login() {
 }
 
 //Fetch clears the stored cache and replaces it with up to date information
-func Fetch() {
-	fetchInfo()
-	fetchModules()
+func Fetch() error {
+	err := fetchInfo()
+	if err != nil {
+		return err
+	}
+	return fetchModules()
 }
 
 //DownloadTask downloads a task from a module
@@ -72,30 +75,31 @@ func ModulePath(mod *Module) string {
 	return path + "/files/" + strings.ReplaceAll(mod.Name, ":", "")
 }
 
-func fetchInfo() {
+func fetchInfo() error {
 	doc, err := downloadHome()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	err = getYearAndCourse(doc)
 	if err != nil {
-		log.Println(err)
+		return err
 	}
 	getName(doc)
 	getTerm(doc)
 	getShortcode(doc)
 	storeInfo()
+	return nil
 }
 
-func fetchModules() {
+func fetchModules() error {
 	doc, err := downloadTimeTable()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	//TODO figure out if the page has given an error
 	termStart = getTermStart(doc)
 	parseModules(doc)
-	storeModules()
+	return storeModules()
 }
 
 func checkDir(dir string) error {

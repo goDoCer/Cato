@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
-	"log"
 	"regexp"
 	"strconv"
 	"strings"
@@ -138,14 +137,14 @@ func parseTask(sel *goquery.Selection, day int, colour string) *Task {
 }
 
 //stores the module struct in modules.json
-func storeModules() {
+func storeModules() error {
 	data, err := json.MarshalIndent(Modules, "", "\t")
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	err = ioutil.WriteFile(path+"/"+modulePath, data, 0644)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 }
 
