@@ -10,12 +10,12 @@ import (
 	"github.com/Akshat-Tripathi/cateCli/fileopen"
 	"github.com/fatih/color"
 	"github.com/manifoldco/promptui"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 //Fetch downloads the current term's timetable
-func Fetch() cli.Command {
-	return cli.Command{
+func Fetch() *cli.Command {
+	return &cli.Command{
 		Name:  "fetch",
 		Usage: "gets the current timetable information",
 		Action: func(c *cli.Context) error {
@@ -25,8 +25,8 @@ func Fetch() cli.Command {
 }
 
 //Get downloads all the files needed for a particular task
-func Get() cli.Command {
-	return cli.Command{
+func Get() *cli.Command {
+	return &cli.Command{
 		Name:  "get",
 		Usage: "downloads all files related to a task",
 		Action: func(c *cli.Context) error {
@@ -46,8 +46,8 @@ func Get() cli.Command {
 }
 
 //Show opens all the files in a task
-func Show() cli.Command {
-	return cli.Command{
+func Show() *cli.Command {
+	return &cli.Command{
 		Name:  "show",
 		Usage: "opens all files related to a task",
 		Action: func(c *cli.Context) error {
@@ -75,8 +75,8 @@ func Show() cli.Command {
 
 //Ls prints out all the modules or all the tasks of a module
 //If showTask is true then module shouldn't be an empty string
-func Ls() cli.Command {
-	return cli.Command{
+func Ls() *cli.Command {
+	return &cli.Command{
 		Name:  "ls",
 		Usage: "lists modules and/or tasks",
 		Flags: []cli.Flag{
@@ -97,8 +97,8 @@ func Ls() cli.Command {
 }
 
 //Login saves the users login in secrets.json
-func Login() cli.Command {
-	return cli.Command{
+func Login() *cli.Command {
+	return &cli.Command{
 		Name:  "login",
 		Usage: "save login details",
 		Action: func(c *cli.Context) error {
