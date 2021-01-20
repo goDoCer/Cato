@@ -92,7 +92,7 @@ func getTerm(doc *goquery.Document) {
 }
 
 func getYearAndCourse(doc *goquery.Document) error {
-	err := errors.New("No class or course information found\nTry cate fetch")
+	err := errors.New("No class or course information found\nTry fetching")
 	doc.Find("[name='class']").
 		EachWithBreak(func(_ int, sel *goquery.Selection) bool {
 			if _, ok := sel.Attr("style"); ok {

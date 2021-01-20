@@ -23,7 +23,6 @@ func init() {
 		panic(err)
 	}
 	path = strings.ReplaceAll(p, "\\", "/")
-	getLoginDetails()
 }
 
 const (
@@ -33,7 +32,8 @@ const (
 
 var auth string
 
-func getLoginDetails() {
+//GetLoginDetails asks the user for their login details
+func GetLoginDetails() {
 	if err := getAuth(); err != nil {
 		fmt.Println("Enter your shortcode")
 		reader := bufio.NewReader(os.Stdin)
@@ -53,6 +53,7 @@ func getLoginDetails() {
 }
 
 func login(url string) (*http.Response, error) {
+	GetLoginDetails()
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err

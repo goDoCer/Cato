@@ -11,17 +11,10 @@ import (
 
 // Init initialises all singletons when a new cate.html file is loaded in
 func Init() {
-	err := loadInfo()
-	if err != nil {
-		fetchInfo()
-	}
+	loadInfo()
+	loadModules()
 
-	err = loadModules()
-	if err != nil {
-		fetchModules()
-	}
-
-	err = checkDir(path + "/" + "files")
+	err := checkDir(path + "/" + "files")
 	if err != nil {
 		log.Fatalln("Failed to create files directory")
 	}
@@ -81,6 +74,7 @@ func fetchInfo() error {
 	if err != nil {
 		return err
 	}
+	fmt.Println(auth)
 	err = getYearAndCourse(doc)
 	if err != nil {
 		return err
