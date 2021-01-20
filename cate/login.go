@@ -48,7 +48,7 @@ func GetLoginDetails() {
 			panic(err)
 		}
 		str := base64.StdEncoding.EncodeToString([]byte(string(shortcode) + ":" + string(bytePassword)))
-		auth = "Basic" + str
+		auth = "Basic " + str
 	}
 }
 
