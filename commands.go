@@ -213,6 +213,8 @@ func selectTask(mod *cate.Module, filters ...func(*cate.Task) bool) (string, err
 	}
 	if len(tasks) == 0 {
 		return "", fmt.Errorf("No tasks found for module: %s", mod.Name)
+	} else if len(tasks) == 1 {
+		return tasks[0], nil
 	}
 	prompt := promptui.Select{
 		Label: "Select a Task",
