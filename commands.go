@@ -14,8 +14,8 @@ import (
 )
 
 //Fetch downloads the current term's timetable
-func Fetch() *cli.Command {
-	return &cli.Command{
+func Fetch() cli.Command {
+	return cli.Command{
 		Name:  "fetch",
 		Usage: "gets the current timetable information",
 		Action: func(c *cli.Context) error {
@@ -25,8 +25,8 @@ func Fetch() *cli.Command {
 }
 
 //Get downloads all the files needed for a particular task
-func Get() *cli.Command {
-	return &cli.Command{
+func Get() cli.Command {
+	return cli.Command{
 		Name:  "get",
 		Usage: "downloads all files related to a task",
 		Action: func(c *cli.Context) error {
@@ -46,8 +46,8 @@ func Get() *cli.Command {
 }
 
 //Show opens all the files in a task
-func Show() *cli.Command {
-	return &cli.Command{
+func Show() cli.Command {
+	return cli.Command{
 		Name:  "show",
 		Usage: "opens all files related to a task",
 		Action: func(c *cli.Context) error {
@@ -68,17 +68,43 @@ func Show() *cli.Command {
 					return err
 				}
 			}
+			return nil
 		},
 	}
 }
 
 //Ls prints out all the modules or all the tasks of a module
 //If showTask is true then module shouldn't be an empty string
-func Ls(showTask bool, module string) {
-	if !showTask {
-		listModules()
-	} else {
-		listTasks(module)
+func Ls() cli.Command {
+	return cli.Command{
+		Name:  "ls",
+		Usage: "lists modules and/or tasks",
+		Flags: []cli.Flag{
+			&cli.BoolTFlag{
+				Name:  "task",
+				Usage: "shows tasks in a module",
+			},
+		},
+		Action: func(c *cli.Context) error {
+			module := c.Args().Get(2)
+			if c.BoolT("task") {
+				return listTasks(module)
+			} else {
+				listModules()
+			}
+			return nil
+		},
+	}
+}
+
+//Login saves the users login in secrets.json
+func Login() cli.Command {
+	return cli.Command{
+		Name:  "login",
+		Usage: "save login details",
+		Action: func(c *cli.Context) error {
+			return cate.Login()
+		},
 	}
 }
 
@@ -88,12 +114,16 @@ func listModules() {
 	}
 }
 
-func listTasks(module string) {
-	mod := getModule(module)
+func listTasks(module string) error {
+	mod, err := getModule(module)
+	if err != nil {
+		return err
+	}
 	time.Sleep(time.Millisecond * 50) //Without this there's a chance that some text doesn't print
 	for _, task := range mod.Tasks {
 		fmt.Println(colourTaskName(task))
 	}
+	return nil
 }
 
 func colourTaskName(task *cate.Task) string {

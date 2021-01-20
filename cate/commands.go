@@ -28,14 +28,15 @@ func Init() {
 }
 
 //Login allows a user to store their login details
-func Login() {
+func Login() error {
 	data, _ := json.Marshal(map[string]string{
 		"Auth": strings.Replace(auth, "Basic", "", 1),
 	})
 	err := ioutil.WriteFile(path+"/"+"secrets.json", data, 0644)
 	if err != nil {
-		fmt.Println("Could not save login details because", err)
+		return fmt.Errorf("Couldn't save login details\n%s", err.Error())
 	}
+	return nil
 }
 
 //Fetch clears the stored cache and replaces it with up to date information

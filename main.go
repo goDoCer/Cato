@@ -11,7 +11,8 @@ func main() {
 	cate.Init()
 
 	app := &cli.App{
-		Commands: []*cli.Command{
+		Name: "Cato",
+		Commands: []cli.Command{
 			Fetch(),
 			Ls(),
 			Login(),
