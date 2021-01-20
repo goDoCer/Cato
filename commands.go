@@ -157,6 +157,9 @@ func getModule(mod string) (*cate.Module, error) {
 	if err != nil {
 		return nil, err
 	}
+	if len(modules) == 1 {
+		return modules[0], nil
+	}
 	return selectModule(modules), nil
 }
 
