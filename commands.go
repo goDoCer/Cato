@@ -30,8 +30,8 @@ func Get() cli.Command {
 		Name:  "get",
 		Usage: "downloads all files related to a task",
 		Action: func(c *cli.Context) error {
-			module := c.Args().Get(2)
-			task := c.Args().Get(3)
+			module := c.Args().Get(0)
+			task := c.Args().Get(1)
 			mod, err := getModule(module)
 			if err != nil {
 				return err
@@ -51,8 +51,8 @@ func Show() cli.Command {
 		Name:  "show",
 		Usage: "opens all files related to a task",
 		Action: func(c *cli.Context) error {
-			module := c.Args().Get(2)
-			task := c.Args().Get(3)
+			module := c.Args().Get(0)
+			task := c.Args().Get(1)
 			mod, err := getModule(module)
 			if err != nil {
 				return err
@@ -80,18 +80,17 @@ func Ls() cli.Command {
 		Name:  "ls",
 		Usage: "lists modules and/or tasks",
 		Flags: []cli.Flag{
-			&cli.BoolTFlag{
+			&cli.BoolFlag{
 				Name:  "task",
 				Usage: "shows tasks in a module",
 			},
 		},
 		Action: func(c *cli.Context) error {
-			module := c.Args().Get(2)
-			if c.BoolT("task") {
+			module := c.Args().Get(0)
+			if c.Bool("task") {
 				return listTasks(module)
-			} else {
-				listModules()
 			}
+			listModules()
 			return nil
 		},
 	}
