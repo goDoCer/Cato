@@ -24,10 +24,24 @@ func Fetch() *cli.Command {
 }
 
 //Get downloads all the files needed for a particular task
-func Get(module, task string) {
-	mod := getModule(module)
-	tsk := getTask(task, mod)
-	cate.DownloadTask(tsk, mod)
+func Get() *cli.Command {
+	return &cli.Command{
+		Name:  "get",
+		Usage: "downloads all files related to a task",
+		Action: func(c *cli.Context) error {
+			module := c.Args().Get(2)
+			task := c.Args().Get(3)
+			mod, err := getModule(module)
+			if err != nil {
+				return err
+			}
+			tsk, err := getTask(task, mod)
+			if err != nil {
+				return err
+			}
+			return cate.DownloadTask(tsk, mod)
+		},
+	}
 }
 
 //Show opens all the files in a task
@@ -83,15 +97,15 @@ func colourTaskName(task *cate.Task) string {
 
 }
 
-func getModule(mod string) *cate.Module {
+func getModule(mod string) (*cate.Module, error) {
 	if mod == "" {
 		mod = selectModule()
 	}
 	module, err := findModule(mod)
 	if err != nil {
-		panic("Module not found, try running fetch")
+		return nil, err
 	}
-	return module
+	return module, nil
 }
 
 func selectModule() string {
@@ -112,16 +126,16 @@ func selectModule() string {
 	return module
 }
 
-func getTask(task string, mod *cate.Module) *cate.Task {
+func getTask(task string, mod *cate.Module) (*cate.Task, error) {
 	if task == "" {
 		task = selectTask(mod)
 	}
 	for _, tsk := range mod.Tasks {
 		if tsk.Name == task {
-			return tsk
+			return tsk, nil
 		}
 	}
-	panic("Task not found")
+	return nil, fmt.Errorf("Task - %s not found", task)
 }
 
 func selectTask(mod *cate.Module) string {

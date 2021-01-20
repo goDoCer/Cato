@@ -48,26 +48,26 @@ func Fetch() error {
 }
 
 //DownloadTask downloads a task from a module
-func DownloadTask(task *Task, mod *Module) {
+func DownloadTask(task *Task, mod *Module) error {
 	if task.Downloaded {
-		return
+		return nil
 	}
 	//Make sure the location exists
 	dir := ModulePath(mod)
 	err := checkDir(dir)
 	if err != nil {
-		log.Fatalln("Failed to create directory", dir, err)
+		return err
 	}
 	defer storeModules()
 	for i, link := range task.Links {
 		filename, err := downloadFile(cateURL+"/"+link, dir)
 		if err != nil {
-			fmt.Println("Error downloading module: "+mod.Name, err)
-			return
+			return fmt.Errorf("Couldn't download %s", filename)
 		}
 		task.FileNames[i] = filename
 	}
 	task.Downloaded = true
+	return nil
 }
 
 //ModulePath returns the path to a module
