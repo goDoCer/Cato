@@ -8,12 +8,21 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 	"syscall"
 
+	"github.com/kardianos/osext"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
+var path string
+
 func init() {
+	p, err := osext.ExecutableFolder()
+	if err != nil {
+		panic(err)
+	}
+	path = strings.ReplaceAll(p, "\\", "/")
 	getLoginDetails()
 }
 
@@ -55,7 +64,7 @@ func login(url string) (*http.Response, error) {
 
 func getAuth() error {
 	var s map[string]string
-	file, err := ioutil.ReadFile("secrets.json")
+	file, err := ioutil.ReadFile(path + "/" + "secrets.json")
 	if err != nil {
 		return err
 	}

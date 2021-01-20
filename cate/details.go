@@ -44,7 +44,7 @@ const (
 )
 
 func loadInfo() error {
-	data, err := ioutil.ReadFile("info.json")
+	data, err := ioutil.ReadFile(path + "/" + "info.json")
 	if err != nil {
 		return err
 	}
@@ -56,7 +56,7 @@ func storeInfo() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = ioutil.WriteFile("info.json", data, 0644)
+	err = ioutil.WriteFile(path+"/"+"info.json", data, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}

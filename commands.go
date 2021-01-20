@@ -28,6 +28,7 @@ func listModules() {
 
 func listTasks(module string) {
 	mod := getModule(module)
+	time.Sleep(time.Millisecond * 50) //Without this there's a chance that some text doesn't print
 	for _, task := range mod.Tasks {
 		fmt.Println(colourTaskName(task))
 	}
@@ -71,6 +72,7 @@ func selectModule() string {
 	prompt := promptui.Select{
 		Label: "Select a module",
 		Items: modules,
+		Size:  len(modules),
 	}
 
 	_, module, err := prompt.Run()
@@ -124,7 +126,6 @@ func Show(module, task string) {
 	tsk := getTask(task, mod)
 	loc := cate.ModulePath(mod)
 	for _, name := range tsk.FileNames {
-		err := fileopen.Open(loc, name)
-		fmt.Println(fmt.Sprintf("\"%s/%s\"", loc, name), err)
+		fileopen.Open(loc, name)
 	}
 }

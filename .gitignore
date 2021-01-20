@@ -24,3 +24,6 @@ info.json
 modules.json
 
 files/*
+install_cato.py
+.gitignore
+cato_installer.SED

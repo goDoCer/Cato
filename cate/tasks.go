@@ -143,14 +143,14 @@ func storeModules() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = ioutil.WriteFile(modulePath, data, 0644)
+	err = ioutil.WriteFile(path+"/"+modulePath, data, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
 func loadModules() error {
-	data, err := ioutil.ReadFile(modulePath)
+	data, err := ioutil.ReadFile(path + "/" + modulePath)
 	if err != nil {
 		return err
 	}

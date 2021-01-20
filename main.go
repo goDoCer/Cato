@@ -20,7 +20,7 @@ func main() {
 	case "fetch":
 		cate.Fetch()
 	case "ls":
-		List(true, "")
+		List(len(os.Args) == 3, "")
 	case "login":
 		cate.Login()
 	case "get":

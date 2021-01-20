@@ -21,7 +21,7 @@ func Init() {
 		fetchModules()
 	}
 
-	err = checkDir("files")
+	err = checkDir(path + "/" + "files")
 	if err != nil {
 		log.Fatalln("Failed to create files directory")
 	}
@@ -32,7 +32,7 @@ func Login() {
 	data, _ := json.Marshal(map[string]string{
 		"Auth": strings.Replace(auth, "Basic", "", 1),
 	})
-	err := ioutil.WriteFile("secrets.json", data, 0644)
+	err := ioutil.WriteFile(path+"/"+"secrets.json", data, 0644)
 	if err != nil {
 		fmt.Println("Could not save login details because", err)
 	}
@@ -57,7 +57,7 @@ func DownloadTask(task *Task, mod *Module) {
 	}
 	defer storeModules()
 	for i, link := range task.Links {
-		filename, err := downloadFile(cateURL+"/"+link, dir+"/")
+		filename, err := downloadFile(cateURL+"/"+link, dir)
 		if err != nil {
 			fmt.Println("Error downloading module: "+mod.Name, err)
 			return
@@ -69,7 +69,7 @@ func DownloadTask(task *Task, mod *Module) {
 
 //ModulePath returns the path to a module
 func ModulePath(mod *Module) string {
-	return "files/" + strings.ReplaceAll(mod.Name, ":", "")
+	return path + "/files/" + strings.ReplaceAll(mod.Name, ":", "")
 }
 
 func fetchInfo() {

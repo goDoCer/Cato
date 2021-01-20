@@ -37,14 +37,13 @@ func downloadFile(url, location string) (string, error) {
 	}
 	defer resp.Body.Close()
 	html, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
 	contentHeader := resp.Header.Get("Content-Disposition")
 	filename := extractFilename.FindAllStringSubmatch(contentHeader, 1)[0][1]
 	if filename == "" {
-		fmt.Println(resp.Header)
 		return "", errors.New("No filename found")
-	}
-	if err != nil {
-		return "", err
 	}
 	return filename, ioutil.WriteFile(location+"/"+filename, html, 0644)
 }
@@ -74,7 +73,7 @@ func download(url, location string) error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(location, html, 0644)
+	return ioutil.WriteFile(path+"/"+location, html, 0644)
 }
 
 //Some files are "given" and so are on a different page than others
