@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Akshat-Tripathi/cateCli/cate"
+	"github.com/Akshat-Tripathi/cateCli/fileopen"
 	"github.com/fatih/color"
 	"github.com/manifoldco/promptui"
 	"github.com/urfave/cli"
@@ -45,12 +46,29 @@ func Get() *cli.Command {
 }
 
 //Show opens all the files in a task
-func Show(module, task string) {
-	mod := getModule(module)
-	tsk := getTask(task, mod)
-	loc := cate.ModulePath(mod)
-	for _, name := range tsk.FileNames {
-		fileopen.Open(loc, name)
+func Show() *cli.Command {
+	return &cli.Command{
+		Name:  "show",
+		Usage: "opens all files related to a task",
+		Action: func(c *cli.Context) error {
+			module := c.Args().Get(2)
+			task := c.Args().Get(3)
+			mod, err := getModule(module)
+			if err != nil {
+				return err
+			}
+			tsk, err := getTask(task, mod)
+			if err != nil {
+				return err
+			}
+			loc := cate.ModulePath(mod)
+			for _, name := range tsk.FileNames {
+				err = fileopen.Open(loc, name)
+				if err != nil {
+					return err
+				}
+			}
+		},
 	}
 }
 
