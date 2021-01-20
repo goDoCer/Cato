@@ -57,7 +57,9 @@ func Show() *cli.Command {
 			if err != nil {
 				return err
 			}
-			tsk, err := getTask(task, mod)
+			tsk, err := getTask(task, mod, func(t *cate.Task) bool {
+				return t.Downloaded
+			})
 			if err != nil {
 				return err
 			}
@@ -181,9 +183,13 @@ func selectModule(mods []*cate.Module) *cate.Module {
 	return mods[moduleIndex]
 }
 
-func getTask(task string, mod *cate.Module) (*cate.Task, error) {
+func getTask(task string, mod *cate.Module, filters ...func(*cate.Task) bool) (*cate.Task, error) {
+	var err error
 	if task == "" {
-		task = selectTask(mod)
+		task, err = selectTask(mod, filters...)
+	}
+	if err != nil {
+		return nil, err
 	}
 	for _, tsk := range mod.Tasks {
 		if tsk.Name == task {
@@ -193,12 +199,20 @@ func getTask(task string, mod *cate.Module) (*cate.Task, error) {
 	return nil, fmt.Errorf("Task - %s not found", task)
 }
 
-func selectTask(mod *cate.Module) string {
+func selectTask(mod *cate.Module, filters ...func(*cate.Task) bool) (string, error) {
 	tasks := make([]string, 0)
+	var ok bool
 	for _, task := range mod.Tasks {
-		if len(task.Links) > 0 {
+		ok = true
+		for _, filter := range filters {
+			ok = ok && filter(task)
+		}
+		if len(task.Links) > 0 && ok {
 			tasks = append(tasks, task.Name)
 		}
+	}
+	if len(tasks) == 0 {
+		return "", fmt.Errorf("No tasks found for module: %s", mod.Name)
 	}
 	prompt := promptui.Select{
 		Label: "Select a Task",
@@ -207,9 +221,9 @@ func selectTask(mod *cate.Module) string {
 
 	_, task, err := prompt.Run()
 	if err != nil {
-		panic("Couldn't select task")
+		return "", err
 	}
-	return task
+	return task, nil
 }
 
 func findModules(name string) (modules []*cate.Module, err error) {
