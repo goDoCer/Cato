@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
-	"strings"
+	"regexp"
 	"time"
 
 	"github.com/Akshat-Tripathi/cateCli/cate"
@@ -87,6 +87,9 @@ func Ls() *cli.Command {
 			},
 		},
 		Action: func(c *cli.Context) error {
+			if len(cate.Modules) == 0 {
+				return fmt.Errorf("No modules found")
+			}
 			module := c.Args().Get(0)
 			if c.Bool("task") {
 				return listTasks(module)
@@ -103,6 +106,7 @@ func Login() *cli.Command {
 		Name:  "login",
 		Usage: "save login details",
 		Action: func(c *cli.Context) error {
+			cate.GetLoginDetails()
 			return cate.Login()
 		},
 	}
@@ -147,18 +151,18 @@ func colourTaskName(task *cate.Task) string {
 
 func getModule(mod string) (*cate.Module, error) {
 	if mod == "" {
-		mod = selectModule()
+		return selectModule(cate.Modules), nil
 	}
-	module, err := findModule(mod)
+	modules, err := findModules(mod)
 	if err != nil {
 		return nil, err
 	}
-	return module, nil
+	return selectModule(modules), nil
 }
 
-func selectModule() string {
-	modules := make([]string, len(cate.Modules))
-	for i, mod := range cate.Modules {
+func selectModule(mods []*cate.Module) *cate.Module {
+	modules := make([]string, len(mods))
+	for i, mod := range mods {
 		modules[i] = mod.Name
 	}
 	prompt := promptui.Select{
@@ -167,11 +171,11 @@ func selectModule() string {
 		Size:  len(modules),
 	}
 
-	_, module, err := prompt.Run()
+	moduleIndex, _, err := prompt.Run()
 	if err != nil {
 		panic("Couldn't select module")
 	}
-	return module
+	return mods[moduleIndex]
 }
 
 func getTask(task string, mod *cate.Module) (*cate.Task, error) {
@@ -205,11 +209,16 @@ func selectTask(mod *cate.Module) string {
 	return task
 }
 
-func findModule(name string) (module *cate.Module, err error) {
+func findModules(name string) (modules []*cate.Module, err error) {
+	matcher := regexp.MustCompile(fmt.Sprintf("(?i).*%s.*", name))
+	modules = make([]*cate.Module, 0, len(cate.Modules))
 	for _, v := range cate.Modules {
-		if strings.Split(v.Name, " ")[0] == name || v.Name == name {
-			return v, nil
+		if matcher.Match([]byte(v.Name)) {
+			modules = append(modules, v)
 		}
 	}
-	return nil, errors.New("Couldn't find module " + name)
+	if len(modules) == 0 {
+		return nil, errors.New("Couldn't find module " + name)
+	}
+	return modules, nil
 }
