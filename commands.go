@@ -81,8 +81,9 @@ func Ls() *cli.Command {
 		Usage: "lists modules and/or tasks",
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
-				Name:  "task",
-				Usage: "shows tasks in a module",
+				Name:    "task",
+				Usage:   "shows tasks in a module",
+				Aliases: []string{"t"},
 			},
 		},
 		Action: func(c *cli.Context) error {
