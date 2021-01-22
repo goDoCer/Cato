@@ -87,6 +87,11 @@ func Ls() *cli.Command {
 				Usage:   "shows tasks in a module",
 				Aliases: []string{"t"},
 			},
+			&cli.BoolFlag{
+				Name:    "deadline",
+				Usage:   "displays task deadlines",
+				Aliases: []string{"d"},
+			},
 		},
 		Action: func(c *cli.Context) error {
 			if len(cate.Modules) == 0 {
@@ -94,7 +99,7 @@ func Ls() *cli.Command {
 			}
 			module := c.Args().Get(0)
 			if c.Bool("task") {
-				return listTasks(module)
+				return listTasks(module, c.Bool("deadline"))
 			}
 			listModules()
 			return nil
@@ -120,14 +125,19 @@ func listModules() {
 	}
 }
 
-func listTasks(module string) error {
+func listTasks(module string, showDeadline bool) error {
 	mod, err := getModule(module)
 	if err != nil {
 		return err
 	}
 	time.Sleep(time.Millisecond * 50) //Without this there's a chance that some text doesn't print
 	for _, task := range mod.Tasks {
-		fmt.Println(colourTaskName(task))
+		fmt.Print(colourTaskName(task))
+		if showDeadline {
+			fmt.Printf(" - %s\n", task.Deadline.Format(time.ANSIC))
+		} else {
+			fmt.Println()
+		}
 	}
 	return nil
 }
