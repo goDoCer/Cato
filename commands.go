@@ -130,10 +130,19 @@ func listTasks(module string, showDeadline bool) error {
 	if err != nil {
 		return err
 	}
+	max := 0
+	for _, task := range mod.Tasks {
+		if len(task.Name) > max {
+			max = len(task.Name)
+		}
+	}
 	time.Sleep(time.Millisecond * 50) //Without this there's a chance that some text doesn't print
 	for _, task := range mod.Tasks {
 		fmt.Print(colourTaskName(task))
 		if showDeadline {
+			for i := 0; i < max-len(task.Name); i++ {
+				fmt.Print(" ")
+			}
 			fmt.Printf(" - %s\n", task.Deadline.Format(time.ANSIC))
 		} else {
 			fmt.Println()

@@ -19,6 +19,7 @@ func main() {
 			Get(),
 			Show(),
 		},
+		UseShortOptionHandling: true,
 	}
 
 	err := app.Run(os.Args)
