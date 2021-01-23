@@ -74,7 +74,6 @@ func fetchInfo() error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(auth)
 	err = getYearAndCourse(doc)
 	if err != nil {
 		return err

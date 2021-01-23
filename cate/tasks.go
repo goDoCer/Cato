@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -103,6 +104,7 @@ func parseModule(sel *goquery.Selection) *Module {
 		)
 		row = row.Next()
 	}
+	sort.Sort(sortByTaskDeadline(tasks))
 	return &Module{
 		Name:  sel.Find("b").Text(),
 		Tasks: tasks,
@@ -152,3 +154,9 @@ func loadModules() error {
 	}
 	return json.Unmarshal(data, &Modules)
 }
+
+type sortByTaskDeadline []*Task
+
+func (a sortByTaskDeadline) Len() int           { return len(a) }
+func (a sortByTaskDeadline) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a sortByTaskDeadline) Less(i, j int) bool { return a[i].Deadline.Before(a[j].Deadline) }
