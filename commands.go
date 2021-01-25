@@ -92,6 +92,11 @@ func Ls() *cli.Command {
 				Usage:   "displays task deadlines",
 				Aliases: []string{"d"},
 			},
+			&cli.BoolFlag{
+				Name:    "local",
+				Usage:   "indicates whether the task has been downloaded",
+				Aliases: []string{"l"},
+			},
 		},
 		Action: func(c *cli.Context) error {
 			if len(cate.Modules) == 0 {
@@ -99,7 +104,7 @@ func Ls() *cli.Command {
 			}
 			module := c.Args().Get(0)
 			if c.Bool("task") {
-				return listTasks(module, c.Bool("deadline"))
+				return listTasks(module, c.Bool("deadline"), c.Bool("local"))
 			}
 			listModules()
 			return nil
@@ -125,7 +130,7 @@ func listModules() {
 	}
 }
 
-func listTasks(module string, showDeadline bool) error {
+func listTasks(module string, showDeadline, showLocal bool) error {
 	mod, err := getModule(module)
 	if err != nil {
 		return err
@@ -138,6 +143,10 @@ func listTasks(module string, showDeadline bool) error {
 	}
 	time.Sleep(time.Millisecond * 50) //Without this there's a chance that some text doesn't print
 	for _, task := range mod.Tasks {
+		if showLocal {
+			downloaded := fmt.Sprint(task.Downloaded)[0]
+			fmt.Printf("%c%d ", downloaded, len(task.Links))
+		}
 		fmt.Print(colourTaskName(task))
 		if showDeadline {
 			for i := 0; i < max-len(task.Name); i++ {

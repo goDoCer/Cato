@@ -53,6 +53,7 @@ func DownloadTask(task *Task, mod *Module) error {
 		return err
 	}
 	defer storeModules()
+	task.FileNames = make([]string, len(task.Links))
 	for i, link := range task.Links {
 		filename, err := downloadFile(cateURL+"/"+link, dir)
 		if err != nil {
