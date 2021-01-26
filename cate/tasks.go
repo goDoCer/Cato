@@ -113,29 +113,35 @@ func parseModule(sel *goquery.Selection) *Module {
 
 func parseTask(sel *goquery.Selection, day int, colour string) *Task {
 	files := make([]string, 0)
+	//Remove redundant whitespace
+	space := regexp.MustCompile(`\s+`)
+	s := space.ReplaceAllString(sel.Text(), " ")
+	task := &Task{
+		Name:      strings.TrimSpace(s),
+		Class:     coloursToGroups[colour],
+		Deadline:  convertDaysToDate(day),
+		FileNames: make([]string, len(files)),
+	}
 	//Search all href tags to find links the point to files
 	sel.Find("[href]").Each(
 		func(_ int, sel *goquery.Selection) {
 			link, exists := sel.Attr("href")
-			if exists && !strings.Contains(link, "mailto") && !strings.Contains(link, "handins") {
+			if exists && !strings.Contains(link, "mailto") {
 				if strings.Contains(link, "given") {
 					files = append(files, getGivenFiles(link)...)
+				} else if strings.Contains(link, "handins") {
+					// deadline, err := getHandinInfo(link)
+					// if err == nil {
+					// 	task.Deadline = deadline
+					// }
 				} else {
 					files = append(files, link)
 				}
 			}
 		},
 	)
-	//Remove redundant whitespace
-	space := regexp.MustCompile(`\s+`)
-	s := space.ReplaceAllString(sel.Text(), " ")
-	return &Task{
-		Name:      strings.TrimSpace(s),
-		Class:     coloursToGroups[colour],
-		Deadline:  convertDaysToDate(day),
-		Links:     files,
-		FileNames: make([]string, len(files)),
-	}
+	task.Links = files
+	return task
 }
 
 //stores the module struct in modules.json
