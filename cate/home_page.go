@@ -43,7 +43,11 @@ const (
 	bio
 )
 
-func loadInfo() error {
+func GetHomePage() {
+
+}
+
+func loadInfo(path string) error {
 	data, err := ioutil.ReadFile(path + "/" + "info.json")
 	if err != nil {
 		return err
@@ -51,7 +55,7 @@ func loadInfo() error {
 	return json.Unmarshal(data, &info)
 }
 
-func storeInfo() {
+func storeInfo(path string) {
 	data, err := json.Marshal(info)
 	if err != nil {
 		log.Fatal(err)

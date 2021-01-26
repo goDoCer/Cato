@@ -1,18 +1,19 @@
 package cate
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/Akshat-Tripathi/cateCli/cate/website"
 )
 
 // Init initialises all singletons when a new cate.html file is loaded in
-func Init() {
-	loadInfo()
-	loadModules()
+func Init(path string) {
+	loadInfo(path)
+	loadModules(path)
 
 	err := checkDir(path + "/" + "files")
 	if err != nil {
@@ -20,44 +21,41 @@ func Init() {
 	}
 }
 
-//Login allows a user to store their login details
-func Login() error {
-	data, _ := json.Marshal(map[string]string{
-		"Auth": strings.Replace(auth, "Basic", "", 1),
-	})
-	err := ioutil.WriteFile(path+"/"+"secrets.json", data, 0644)
-	if err != nil {
-		return fmt.Errorf("Couldn't save login details\n%s", err.Error())
-	}
-	return nil
+//SetAuth allows this module to make requests to cate
+func SetAuth(auth string) {
+	website.SetAuth(auth)
 }
 
 //Fetch clears the stored cache and replaces it with up to date information
-func Fetch() error {
-	err := fetchInfo()
+func Fetch(path string) error {
+	err := fetchInfo(path)
 	if err != nil {
 		return err
 	}
-	return fetchModules()
+	return fetchModules(path)
 }
 
 //DownloadTask downloads a task from a module
-func DownloadTask(task *Task, mod *Module) error {
+func DownloadTask(task *Task, mod *Module, path string) error {
 	if task.Downloaded {
 		return nil
 	}
 	//Make sure the location exists
-	dir := ModulePath(mod)
+	dir := path + ModulePath(mod)
 	err := checkDir(dir)
 	if err != nil {
 		return err
 	}
-	defer storeModules()
+	defer storeModules(path)
 	task.FileNames = make([]string, len(task.Links))
 	for i, link := range task.Links {
-		filename, err := downloadFile(cateURL+"/"+link, dir)
+		filename, data, err := website.GetFile(website.CateURL + "/" + link)
 		if err != nil {
 			return fmt.Errorf("Couldn't download %s", filename)
+		}
+		err = ioutil.WriteFile(dir+"/"+filename, data, 0644)
+		if err != nil {
+			return err
 		}
 		task.FileNames[i] = filename
 	}
@@ -65,13 +63,13 @@ func DownloadTask(task *Task, mod *Module) error {
 	return nil
 }
 
-//ModulePath returns the path to a module
+//ModulePath returns the relative path to a module
 func ModulePath(mod *Module) string {
-	return path + "/files/" + strings.ReplaceAll(mod.Name, ":", "")
+	return "/files/" + strings.ReplaceAll(mod.Name, ":", "")
 }
 
-func fetchInfo() error {
-	doc, err := downloadHome()
+func fetchInfo(path string) error {
+	doc, err := website.GetPage(website.CateURL)
 	if err != nil {
 		return err
 	}
@@ -82,19 +80,20 @@ func fetchInfo() error {
 	getName(doc)
 	getTerm(doc)
 	getShortcode(doc)
-	storeInfo()
+	storeInfo(path)
 	return nil
 }
 
-func fetchModules() error {
-	doc, err := downloadTimeTable()
+func fetchModules(path string) error {
+	doc, err := website.GetPage(fmt.Sprintf(website.TimeTableURL,
+		getAcademicYear(), info.Term, info.Code, info.Shortcode))
 	if err != nil {
 		return err
 	}
 	//TODO figure out if the page has given an error
 	termStart = getTermStart(doc)
 	parseModules(doc)
-	return storeModules()
+	return storeModules(path)
 }
 
 func checkDir(dir string) error {

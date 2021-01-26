@@ -1,9 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/Akshat-Tripathi/cateCli/cate"
@@ -19,7 +22,8 @@ func Fetch() *cli.Command {
 		Name:  "fetch",
 		Usage: "gets the current timetable information",
 		Action: func(c *cli.Context) error {
-			return cate.Fetch()
+			cate.SetAuth(getLoginDetails())
+			return cate.Fetch(path)
 		},
 	}
 }
@@ -40,7 +44,8 @@ func Get() *cli.Command {
 			if err != nil {
 				return err
 			}
-			return cate.DownloadTask(tsk, mod)
+			cate.SetAuth(getLoginDetails())
+			return cate.DownloadTask(tsk, mod, path)
 		},
 	}
 }
@@ -63,7 +68,7 @@ func Show() *cli.Command {
 			if err != nil {
 				return err
 			}
-			loc := cate.ModulePath(mod)
+			loc := path + cate.ModulePath(mod)
 			for _, name := range tsk.FileNames {
 				err = fileopen.Open(loc, name)
 				if err != nil {
@@ -118,8 +123,14 @@ func Login() *cli.Command {
 		Name:  "login",
 		Usage: "save login details",
 		Action: func(c *cli.Context) error {
-			cate.GetLoginDetails()
-			return cate.Login()
+			data, _ := json.Marshal(map[string]string{
+				"Auth": strings.Replace(getLoginDetails(), "Basic", "", 1),
+			})
+			err := ioutil.WriteFile(path+"/"+"secrets.json", data, 0644)
+			if err != nil {
+				return fmt.Errorf("Couldn't save login details\n%s", err.Error())
+			}
+			return nil
 		},
 	}
 }

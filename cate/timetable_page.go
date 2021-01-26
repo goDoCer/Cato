@@ -145,7 +145,7 @@ func parseTask(sel *goquery.Selection, day int, colour string) *Task {
 }
 
 //stores the module struct in modules.json
-func storeModules() error {
+func storeModules(path string) error {
 	data, err := json.MarshalIndent(Modules, "", "\t")
 	if err != nil {
 		return err
@@ -153,7 +153,7 @@ func storeModules() error {
 	return ioutil.WriteFile(path+"/"+modulePath, data, 0644)
 }
 
-func loadModules() error {
+func loadModules(path string) error {
 	data, err := ioutil.ReadFile(path + "/" + modulePath)
 	if err != nil {
 		return err
