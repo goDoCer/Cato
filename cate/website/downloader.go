@@ -13,6 +13,7 @@ import (
 var extractFilename = regexp.MustCompile("filename=\"(.*)\"")
 
 //GetPage downloads a page from a url
+//TODO figure out if the page has given an error
 func GetPage(url string) (*goquery.Document, error) {
 	resp, err := login(url)
 	if err != nil {

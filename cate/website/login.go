@@ -1,6 +1,7 @@
 package website
 
 import (
+	"errors"
 	"net/http"
 )
 
@@ -24,5 +25,8 @@ func login(url string) (*http.Response, error) {
 	}
 	req.Header.Add("Authorization", auth)
 	resp, err := http.DefaultClient.Do(req)
+	if resp.StatusCode == http.StatusUnauthorized {
+		return nil, errors.New("Access forbidden")
+	}
 	return resp, err
 }

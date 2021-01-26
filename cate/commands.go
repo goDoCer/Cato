@@ -90,7 +90,6 @@ func fetchModules(path string) error {
 	if err != nil {
 		return err
 	}
-	//TODO figure out if the page has given an error
 	termStart = getTermStart(doc)
 	parseModules(doc)
 	return storeModules(path)
